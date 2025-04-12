@@ -10,15 +10,9 @@ want_proxmox_nodes_ansible_host: false
 keyed_groups:
   - key: proxmox_tags_parsed
     prefix: tag
-  - key: role
-    prefix: ""
 compose:
   ansible_host: proxmox_ipconfig0.ip | default(proxmox_net0.ip) | ipaddr('address')
   ansible_user: "'user'"
-  role: >
-    {% if inventory_hostname in ['node151', 'node152', 'node153'] %}
-      server
-    {% endif %}
 
   # Required Vars
   vars:
