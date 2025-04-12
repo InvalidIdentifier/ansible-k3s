@@ -43,8 +43,11 @@ install_k3s:
         PLAYBOOK="reset.yml"
       elif [ "$MODE" == "upgrade" ]; then
         PLAYBOOK="upgrade.yml"
-      else
+      elif [ "$MODE" == "deploy" ]; then
         PLAYBOOK="site.yml"
+      else
+        echo "Could not determine mode. Aborting."
+        exit 1
       fi
 
       export PROXMOX_URL_241=$PROXMOX_URL_241
