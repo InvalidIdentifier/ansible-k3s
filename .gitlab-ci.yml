@@ -1,5 +1,7 @@
 workflow:
   name: 'k3s-ansible'
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "web"
 
 stages:
   - install_k3s
@@ -32,7 +34,6 @@ before_script:
 install_k3s:
   stage: install_k3s
   image: registry.${DOMAIN}/glrunner:ansible
-  when: manual
   script:
     - |
       ####  node k3s deployment ####
