@@ -1,0 +1,70 @@
+workflow:
+  name: 'k3s-ansible'
+
+stages:
+  - install_k3s
+  - send_notification
+
+variables:
+  MODE:
+    value: "upgrade"
+    options:
+      - "reboot"
+      - "reset"
+      - "deploy"
+      - "upgrade"
+    description: "Define deployment mode"
+
+before_script:
+  - |
+    # create ssh 
+    mkdir -p ~/.ssh
+
+    eval $(ssh-agent -s)
+
+    cp "$SSH_PRIV_KEY_ED25519_FILE" ~/.ssh/id_ed25519 && chmod 400 ~/.ssh/id_ed25519
+    cp "$SSH_PUB_KEY_ED25519_FILE" ~/.ssh/id_ed25519.pub
+
+    ssh-add ~/.ssh/id_ed25519
+
+    chmod 700 ~/.ssh
+
+install_k3s:
+  stage: install_k3s
+  image: registry.${DOMAIN}/glrunner:ansible
+  when: manual
+  script:
+    - |
+      ####  node k3s deployment ####
+
+      if [ "$MODE" == "reboot" ]; then
+        PLAYBOOK="reboot"
+      elif [ "$MODE" == "reset" ]; then
+        PLAYBOOK="reset"
+      elif [ "$MODE" == "deploy" ]; then
+        PLAYBOOK="site"
+      elif [ "$MODE" == "upgrade" ]; then
+        PLAYBOOK="upgrade"
+      else
+        echo "Invalid mode: $MODE"
+        exit 1
+      fi
+      export PROXMOX_URL_241=$PROXMOX_URL_241
+      export PROXMOX_USER=$PROXMOX_USER
+      export PROXMOX_TOKEN_ID=$PROXMOX_TOKEN_ID
+      export PROXMOX_TOKEN_SECRET=$PROXMOX_TOKEN_SECRET
+
+      ansible-galaxy collection install git+https://github.com/k3s-io/k3s-ansible.git
+      
+      ANSIBLE_CONFIG=/${CI_BUILDS_DIR}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/ansible.cfg ansible-playbook k3s.orchestration.${PLAYBOOK} -i inventory.proxmox.yml
+
+send_notification:
+  stage: send_notification
+  image: registry.${DOMAIN}/glrunner:base
+  when: manual
+  script:
+    - |
+      ####  send notifications ####
+      curl -H "X-Tags: robot" -u :$NTFY_TOKEN -d "Pipeline - $CI_PIPELINE_NAME - was successfull" https://notify.${DOMAIN}/pipelines
+  needs: 
+    - install_k3s
