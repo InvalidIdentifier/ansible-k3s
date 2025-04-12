@@ -52,7 +52,7 @@ install_k3s:
       export PROXMOX_TOKEN_ID=$PROXMOX_TOKEN_ID
       export PROXMOX_TOKEN_SECRET=$PROXMOX_TOKEN_SECRET
       
-      ANSIBLE_CONFIG=/${CI_BUILDS_DIR}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/ansible.cfg ansible-playbook playbooks/site.yml -i inventory.proxmox.yml
+      ANSIBLE_CONFIG=/${CI_BUILDS_DIR}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/ansible.cfg ansible-playbook playbooks/${PLAYBOOK} -i inventory.proxmox.yml
 
 send_notification:
   stage: send_notification
