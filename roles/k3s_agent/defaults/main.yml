@@ -4,3 +4,8 @@ k3s_server_location: "/var/lib/rancher/k3s"  # noqa var-naming[no-role-prefix]
 systemd_dir: "/etc/systemd/system"  # noqa var-naming[no-role-prefix]
 api_port: 6443  # noqa var-naming[no-role-prefix]
 extra_agent_args: "" # noqa var-naming[no-role-prefix]
+ansible_port: 22
+k3s_version: v1.30.2+k3s1
+token: "{{ lookup('env', 'K3S_TOKEN') }}"
+api_endpoint: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
+extra_server_args: "--tls-san={{ lookup('env', 'VLAN_INFRA') }}.100"

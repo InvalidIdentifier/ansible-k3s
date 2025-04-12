@@ -9,3 +9,7 @@ server_group: server  # noqa var-naming[no-role-prefix]
 agent_group: agent  # noqa var-naming[no-role-prefix]
 use_external_database: false # noqa var-naming[no-role-prefix]
 extra_server_args: "" # noqa var-naming[no-role-prefix]
+ansible_port: 22
+k3s_version: v1.30.2+k3s1
+token: "{{ lookup('env', 'K3S_TOKEN') }}"
+api_endpoint: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
