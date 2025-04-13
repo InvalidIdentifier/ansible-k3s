@@ -55,10 +55,10 @@
         mode: "0644"
 
 - name: Init first server node
-  when: inventory_hostname == groups[tag_k3s_server][0]
+  when: inventory_hostname == groups["tag_k3s_server"][0]
   block:
     - name: Copy K3s service file [Single]
-      when: groups[tag_k3s_server] | length == 1 or use_external_database
+      when: groups["tag_k3s_server"] | length == 1 or use_external_database
       ansible.builtin.template:
         src: "k3s-single.service.j2"
         dest: "{{ systemd_dir }}/k3s.service"
@@ -69,7 +69,7 @@
 
     - name: Copy K3s service file [HA]
       when:
-        - groups[tag_k3s_server] | length > 1
+        - groups["tag_k3s_server"] | length > 1
         - not use_external_database
       ansible.builtin.template:
         src: "k3s-cluster-init.service.j2"
@@ -120,7 +120,7 @@
         enabled: true
 
     - name: Pause to allow first server startup
-      when: (groups[tag_k3s_server] | length) > 1
+      when: (groups["tag_k3s_server"] | length) > 1
       ansible.builtin.pause:
         seconds: 10
 
@@ -202,12 +202,12 @@
 
 - name: Start other server if any and verify status
   when:
-    - (groups[tag_k3s_server] | length) > 1
-    - inventory_hostname != groups[tag_k3s_server][0]
+    - (groups["tag_k3s_server"] | length) > 1
+    - inventory_hostname != groups["tag_k3s_server"][0]
   block:
     - name: Get the token from the first server
       ansible.builtin.set_fact:
-        token: "{{ hostvars[groups[tag_k3s_server][0]].token }}"
+        token: "{{ hostvars[groups["tag_k3s_server"][0]].token }}"
 
     - name: Delete any existing token from the environment if different from the new one
       ansible.builtin.lineinfile:
@@ -262,12 +262,12 @@
         enabled: true
 
     - name: Verify that all server nodes joined
-      when: (groups[tag_k3s_server] | length) > 1
+      when: (groups["tag_k3s_server"] | length) > 1
       ansible.builtin.command:
         cmd: >
           k3s kubectl get nodes -l "node-role.kubernetes.io/control-plane=true" -o=jsonpath="{.items[*].metadata.name}"
       register: nodes
-      until: nodes.rc == 0 and (nodes.stdout.split() | length) == (groups[tag_k3s_server] | length)
+      until: nodes.rc == 0 and (nodes.stdout.split() | length) == (groups["tag_k3s_server"] | length)
       retries: 20
       delay: 10
       changed_when: false
