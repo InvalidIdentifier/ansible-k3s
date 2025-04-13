@@ -7,7 +7,7 @@ k3s_version: v1.30.2+k3s1
 # You can use ansible-vault to encrypt this value / keep it secret.
 # Or you can omit it if not using Vagrant and let the first server automatically generate one.
 token: "{{ lookup('env', 'K3S_TOKEN') }}"
-api_endpoint: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
+api_endpoint: "{{ hostvars[groups['tag_k3s_server'][0]]['ansible_host'] | default(groups['tag_k3s_server'][0]) }}"
 
 # Optional vars
 extra_server_args: "--tls-san={{ lookup('env', 'VLAN_INFRA') }}.100"
