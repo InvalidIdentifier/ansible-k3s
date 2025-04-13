@@ -7,13 +7,13 @@
     - role: prereq
 
 - name: Setup K3S server
-  hosts: server
+  hosts: k3s_server
   become: true
   roles:
     - role: k3s_server
 
 - name: Setup K3S agent
-  hosts: agent
+  hosts: k3s_server
   become: true
   roles:
     - role: k3s_agent
