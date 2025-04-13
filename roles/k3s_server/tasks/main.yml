@@ -4,6 +4,7 @@
   register: k3s_version_output
   changed_when: false
   ignore_errors: true
+  failed_when: false
 
 - name: Set k3s installed version
   when: k3s_version_output.rc == 0
