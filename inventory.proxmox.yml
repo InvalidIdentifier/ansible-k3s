@@ -9,8 +9,7 @@ want_proxmox_nodes: false
 want_proxmox_nodes_ansible_host: false
 keyed_groups:
   - key: proxmox_tags_parsed
-    prefix: ""
-    separator: ""
+    prefix: tag
 compose:
   ansible_host: proxmox_ipconfig0.ip | default(proxmox_net0.ip) | ipaddr('address')
   ansible_user: "'user'"
@@ -18,7 +17,7 @@ groups:
   master: "'k3s_server' in group_names"
   agent: "'k3s_agent' in group_names"
   k3s_cluster: "'master' in group_names or 'agent' in group_names"
-  
+
 # Required Vars
 vars:
   ansible_port: 22
