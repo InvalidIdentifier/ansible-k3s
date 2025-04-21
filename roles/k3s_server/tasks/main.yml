@@ -96,7 +96,7 @@
     # Add the token to the environment if it has been provided.
     # Otherwise, let the first server create one on the first run.
     - name: Add token as an environment variable
-      no_log: true # avoid logging the server token
+      # no_log: true # avoid logging the server token
       ansible.builtin.lineinfile:
         path: "{{ systemd_dir }}/k3s.service.env"
         line: "K3S_TOKEN={{ token }}"
